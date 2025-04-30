@@ -90,12 +90,6 @@ public class UserDao {
 			conditionAdded = true;
 		}
 
-		if (!UtilityClass.isNull(beans.getPin())) {
-			query.append(conditionAdded ? " AND " : " WHERE ").append(" ua.pin = ? ");
-			params.add(beans.getPin());
-			conditionAdded = true;
-		}
-
 		query.append(conditionAdded ? " AND " : " WHERE ").append(" up.active_status = 1 AND up.deleted_status = 0 ")
 				.append(" ORDER BY ua.created_on DESC LIMIT 1");
 
@@ -116,9 +110,9 @@ public class UserDao {
 		List<Object> params = new ArrayList<>();
 		boolean conditionAdded = false;
 
-		if (!UtilityClass.isNull(beans.getCustomerId())) {
+		if (!UtilityClass.isNull(beans.getUserId())) {
 			query.append(conditionAdded ? " AND " : " WHERE ").append(" up.id = ? ");
-			params.add(beans.getCustomerId());
+			params.add(beans.getUserId());
 			conditionAdded = true;
 		}
 
@@ -152,6 +146,13 @@ public class UserDao {
 		updateQuery.append("UPDATE user_profile SET ").append(" active_status = ? ").append(" WHERE id = ? ");
 
 		return jdbcTemplate.update(updateQuery.toString(), beans.getActiveStatus(), beans.getUserId());
+	}
+
+	public int resetPassword(UserBeans beans) {
+		StringBuilder updateQuery = new StringBuilder();
+		updateQuery.append("UPDATE user_auth ua SET ").append(" pin = ? ").append(" WHERE ua.id = ? ");
+
+		return jdbcTemplate.update(updateQuery.toString(), beans.getPin(), beans.getAuthId());
 	}
 
 }

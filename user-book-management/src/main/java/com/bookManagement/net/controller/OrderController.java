@@ -2,12 +2,11 @@ package com.bookManagement.net.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bookManagement.net.beans.ResponseWrapper;
 import com.bookManagement.net.dto.OrderDto;
+import com.bookManagement.net.services.DetailValidationGroup;
 import com.bookManagement.net.services.OrderService;
+import com.bookManagement.net.services.ReviewValidationGroup;
 import com.bookManagement.net.util.ResponseDetails;
 
 @RestController
@@ -27,16 +28,7 @@ public class OrderController {
 	private OrderService orderService;
 
 	@PostMapping("/createOrder")
-	public ResponseEntity<?> createOrder(@RequestBody OrderDto dto, BindingResult bindingResult) {
-
-		if (bindingResult.hasErrors()) {
-			String errorMessage = bindingResult.getFieldErrors().stream()
-					.map(error -> error.getDefaultMessage().toString()).collect(Collectors.joining(", "));
-
-			Map<String, Object> response = new HashMap<>();
-			response.put("status", HttpStatus.BAD_REQUEST.value());
-			response.put("message", errorMessage);
-		}
+	public ResponseEntity<?> createOrder(@RequestBody OrderDto dto) {
 
 		try {
 
@@ -65,18 +57,15 @@ public class OrderController {
 	}
 
 	@PostMapping("/review")
-	public ResponseEntity<?> orderReview(@RequestBody OrderDto dto, BindingResult bindingResult) {
-
-		if (bindingResult.hasErrors()) {
-			String errorMessage = bindingResult.getFieldErrors().stream()
-					.map(error -> error.getDefaultMessage().toString()).collect(Collectors.joining(", "));
-
-			Map<String, Object> response = new HashMap<>();
-			response.put("status", HttpStatus.BAD_REQUEST.value());
-			response.put("message", errorMessage);
-		}
+	public ResponseEntity<?> orderReview(@Validated(ReviewValidationGroup.class) @RequestBody OrderDto dto) {
 
 		try {
+
+			ResponseWrapper<?> alreadyReviewed = orderService.existingReviewForCustomerId(dto);
+			if (alreadyReviewed.getSuccess() != 0) {
+				return ResponseEntity.status(alreadyReviewed.getStatus())
+						.body(Map.of("status", alreadyReviewed.getStatus(), "message", alreadyReviewed.getMessage()));
+			}
 
 			ResponseWrapper<?> DBresponse = orderService.orderReview(dto);
 
@@ -103,16 +92,7 @@ public class OrderController {
 	}
 
 	@GetMapping("/details")
-	public ResponseEntity<?> getOrderById(@RequestBody OrderDto dto, BindingResult bindingResult) {
-
-		if (bindingResult.hasErrors()) {
-			String errorMessage = bindingResult.getFieldErrors().stream()
-					.map(error -> error.getDefaultMessage().toString()).collect(Collectors.joining(", "));
-
-			Map<String, Object> response = new HashMap<>();
-			response.put("status", HttpStatus.BAD_REQUEST.value());
-			response.put("message", errorMessage);
-		}
+	public ResponseEntity<?> getOrderById(@Validated(DetailValidationGroup.class) @RequestBody OrderDto dto) {
 
 		try {
 

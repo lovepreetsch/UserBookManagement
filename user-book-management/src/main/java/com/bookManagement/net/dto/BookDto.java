@@ -1,20 +1,51 @@
 package com.bookManagement.net.dto;
 
+import com.bookManagement.net.services.DetailValidationGroup;
+import com.bookManagement.net.services.FullValidationGroup;
+import com.bookManagement.net.services.MinimalValidationGroup;
+import com.bookManagement.net.services.ReviewValidationGroup;
+import com.bookManagement.net.services.UpdateStatusValidationGroup;
+import com.bookManagement.net.services.UpdateValidationGroup;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class BookDto {
 
+	@NotBlank(message = "Book Id is required", groups = { DetailValidationGroup.class, UpdateValidationGroup.class,
+			UpdateStatusValidationGroup.class, ReviewValidationGroup.class })
 	private String id;
+
+	@NotBlank(message = "User Id is required", groups = { FullValidationGroup.class, MinimalValidationGroup.class,
+			UpdateValidationGroup.class, UpdateStatusValidationGroup.class })
 	private String userId;
+
+	@NotBlank(message = "Customer Id is required", groups = ReviewValidationGroup.class)
 	private String customerId;
 	private String orderId;
+
+	@NotBlank(message = "Title is required", groups = { FullValidationGroup.class, UpdateValidationGroup.class })
 	private String title;
+
+	@NotBlank(message = "Description is required", groups = { FullValidationGroup.class, UpdateValidationGroup.class })
 	private String description;
+
+	@NotBlank(message = "Author is required", groups = { FullValidationGroup.class, UpdateValidationGroup.class })
 	private String author;
+
+	@NotBlank(message = "Price can not be null", groups = { FullValidationGroup.class, UpdateValidationGroup.class })
 	private String price;
+
+	@NotBlank(message = "Quantity is required", groups = { FullValidationGroup.class, UpdateValidationGroup.class })
 	private String quantity;
-	private String review;
+
+	@NotBlank(message = "Please enter your rating", groups = ReviewValidationGroup.class)
+	private String rating;
+	private String comment;
+
+	@NotNull(message = "Active status is required", groups = UpdateStatusValidationGroup.class)
 	private Boolean activeStatus;
 
 	public String getId() {
@@ -89,20 +120,28 @@ public class BookDto {
 		this.quantity = quantity;
 	}
 
-	public String getReview() {
-		return review;
-	}
-
-	public void setReview(String review) {
-		this.review = review;
-	}
-
 	public Boolean getActiveStatus() {
 		return activeStatus;
 	}
 
 	public void setActiveStatus(Boolean activeStatus) {
 		this.activeStatus = activeStatus;
+	}
+
+	public String getRating() {
+		return rating;
+	}
+
+	public void setRating(String rating) {
+		this.rating = rating;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 }

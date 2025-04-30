@@ -108,8 +108,9 @@ public class OrderService {
 		try {
 			OrderBeans beans = new OrderBeans();
 			beans.setOrderId(dto.getOrderId());
+			beans.setCustomerId(dto.getCustomerId());
 			beans.setRating(dto.getRating());
-			beans.setReviewDescription(dto.getReviewDescription());
+			beans.setComment(dto.getComment());
 
 			int rowsAffected = orderDao.orderReview(beans);
 
@@ -127,6 +128,29 @@ public class OrderService {
 			e.printStackTrace();
 			return new ResponseWrapper<>(-1, "An error occurred: " + e.getMessage(),
 					ResponseDetails.INTERNAL_SERVER_ERROR_HttpStatusCode, "Database error or exception");
+		}
+	}
+
+	public ResponseWrapper<?> existingReviewForCustomerId(OrderDto dto) {
+
+		try {
+			OrderBeans beans = new OrderBeans();
+			beans.setOrderId(dto.getOrderId());
+			beans.setCustomerId(dto.getCustomerId());
+
+			List<Map<String, Object>> response = orderDao.existingReviewForCustomerId(beans);
+
+			if (response.isEmpty()) {
+				return new ResponseWrapper<>(0, ResponseDetails.INTERNAL_SERVER_ERROR_HttpStatusCode,
+						"No review found");
+			} else {
+				return new ResponseWrapper<>(1, "You’ve already reviewed this order", ResponseDetails.OK_HttpStatusCode,
+						response);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseWrapper<>(-1, ResponseDetails.INTERNAL_SERVER_ERROR_HttpStatusCode,
+					"An error occurred: " + e.getMessage());
 		}
 	}
 

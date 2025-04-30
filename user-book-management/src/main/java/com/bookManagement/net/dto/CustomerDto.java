@@ -1,9 +1,14 @@
 package com.bookManagement.net.dto;
 
+import com.bookManagement.net.services.DetailValidationGroup;
 import com.bookManagement.net.services.FullValidationGroup;
+import com.bookManagement.net.services.MinimalValidationGroup;
+import com.bookManagement.net.services.UpdateStatusValidationGroup;
+import com.bookManagement.net.services.UpdateValidationGroup;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -11,10 +16,20 @@ public class CustomerDto {
 
 	private String id;
 	private String bookId;
+
+	@NotBlank(message = "User Id is required", groups = { MinimalValidationGroup.class,
+			UpdateStatusValidationGroup.class })
 	private String userId;
+
+	@NotBlank(message = "Customer Id is required", groups = { DetailValidationGroup.class, UpdateValidationGroup.class,
+			UpdateStatusValidationGroup.class })
 	private String customerId;
 	private String authId;
+
+	@NotBlank(message = "Title is required", groups = UpdateValidationGroup.class)
 	private String title;
+
+	@NotBlank(message = "Name is required", groups = UpdateValidationGroup.class)
 	private String name;
 
 	@Email
@@ -23,32 +38,32 @@ public class CustomerDto {
 
 	@NotBlank(message = "Mobile number is required", groups = FullValidationGroup.class)
 	private String mobileNumber;
-	private String otp;
-	private String verified;
-	private String role;
-	private Boolean isValid;
 
 	@NotBlank(message = "Password is required", groups = FullValidationGroup.class)
 	private String pin;
 	private String page;
 	private String count;
+
+	@NotBlank(message = "Blood group is required", groups = UpdateValidationGroup.class)
 	private String bloodGroup;
 	private String invitationStatus;
 	private String token;
 	public String JWtoken;
+
+	@NotBlank(message = "Gender is required", groups = UpdateValidationGroup.class)
 	private String gender;
+
+	@NotBlank(message = "Date of Birth is required", groups = UpdateValidationGroup.class)
 	private String DOB;
 	private String age;
 	private String orderId;
-	private String providerId;
-	private String StaffId;
+
+	@NotNull(message = "Active status is required", groups = UpdateStatusValidationGroup.class)
 	private Boolean activeStatus;
-	private Boolean isDeleted;
-	public Boolean isPatient = false;
-	public Boolean isProvider = false;
-	public Boolean isStaff = false;
 	private String rating;
 	private String reviewDescription;
+
+	private String role;
 
 	public String getId() {
 		return id;
@@ -124,38 +139,6 @@ public class CustomerDto {
 
 	public void setMobileNumber(String mobileNumber) {
 		this.mobileNumber = mobileNumber;
-	}
-
-	public String getOtp() {
-		return otp;
-	}
-
-	public void setOtp(String otp) {
-		this.otp = otp;
-	}
-
-	public String getVerified() {
-		return verified;
-	}
-
-	public void setVerified(String verified) {
-		this.verified = verified;
-	}
-
-	public String getRole() {
-		return role;
-	}
-
-	public void setRole(String role) {
-		this.role = role;
-	}
-
-	public Boolean getIsValid() {
-		return isValid;
-	}
-
-	public void setIsValid(Boolean isValid) {
-		this.isValid = isValid;
 	}
 
 	public String getPin() {
@@ -246,60 +229,12 @@ public class CustomerDto {
 		this.orderId = orderId;
 	}
 
-	public String getProviderId() {
-		return providerId;
-	}
-
-	public void setProviderId(String providerId) {
-		this.providerId = providerId;
-	}
-
-	public String getStaffId() {
-		return StaffId;
-	}
-
-	public void setStaffId(String staffId) {
-		StaffId = staffId;
-	}
-
 	public boolean getActiveStatus() {
 		return activeStatus;
 	}
 
 	public void setActiveStatus(boolean activeStatus) {
 		this.activeStatus = activeStatus;
-	}
-
-	public Boolean getIsDeleted() {
-		return isDeleted;
-	}
-
-	public void setIsDeleted(Boolean isDeleted) {
-		this.isDeleted = isDeleted;
-	}
-
-	public Boolean getIsPatient() {
-		return isPatient;
-	}
-
-	public void setIsPatient(Boolean isPatient) {
-		this.isPatient = isPatient;
-	}
-
-	public Boolean getIsProvider() {
-		return isProvider;
-	}
-
-	public void setIsProvider(Boolean isProvider) {
-		this.isProvider = isProvider;
-	}
-
-	public Boolean getIsStaff() {
-		return isStaff;
-	}
-
-	public void setIsStaff(Boolean isStaff) {
-		this.isStaff = isStaff;
 	}
 
 	public String getRating() {
@@ -316,6 +251,14 @@ public class CustomerDto {
 
 	public void setReviewDescription(String reviewDescription) {
 		this.reviewDescription = reviewDescription;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
 	}
 
 }

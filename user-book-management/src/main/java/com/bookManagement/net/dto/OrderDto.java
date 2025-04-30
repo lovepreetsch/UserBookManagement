@@ -1,5 +1,9 @@
 package com.bookManagement.net.dto;
 
+import com.bookManagement.net.services.DetailValidationGroup;
+import com.bookManagement.net.services.ReviewValidationGroup;
+
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
@@ -9,11 +13,15 @@ public class OrderDto {
 	private String userId;
 	private String bookId;
 	private String customerId;
+
+	@NotBlank(message = "Order Id is required", groups = { ReviewValidationGroup.class, DetailValidationGroup.class })
 	private String orderId;
 	private String quantity;
 	private String totalAmount;
+
+	@NotBlank(message = "Please enter your rating", groups = ReviewValidationGroup.class)
 	private String rating;
-	private String reviewDescription;
+	private String comment;
 
 	public String getId() {
 		return id;
@@ -79,12 +87,12 @@ public class OrderDto {
 		this.rating = rating;
 	}
 
-	public String getReviewDescription() {
-		return reviewDescription;
+	public String getComment() {
+		return comment;
 	}
 
-	public void setReviewDescription(String reviewDescription) {
-		this.reviewDescription = reviewDescription;
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 }

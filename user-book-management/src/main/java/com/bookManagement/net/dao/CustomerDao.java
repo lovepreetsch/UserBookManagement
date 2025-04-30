@@ -304,7 +304,7 @@ public class CustomerDao {
 		query.append(
 				"SELECT ord.id AS orderId, ord.book_id AS bookId, ord.quantity AS orderQuantity, ord.total_amount AS totalAmount , "
 						+ " bk.title AS bookTitle , bk.description AS bookDescription, bk.author AS bookAuthor, bk.price AS bookPrice, "
-						+ " orv.rating AS orderRating, orv.description AS orderReview FROM customer_profile cp ")
+						+ " orv.rating AS orderRating, orv.comment AS comment FROM customer_profile cp ")
 				.append(" LEFT JOIN orders ord ON ord.customer_id = cp.id ")
 				.append(" LEFT JOIN book bk ON bk.id = ord.book_id ")
 				.append(" LEFT JOIN order_review orv ON orv.order_id = ord.id ");
@@ -330,11 +330,18 @@ public class CustomerDao {
 			map.put("bookDescription", rs.getObject("bookDescription"));
 			map.put("bookAuthor", rs.getObject("bookAuthor"));
 			map.put("bookPrice", rs.getObject("bookPrice"));
-			map.put("orderRating", rs.getObject("orderRating"));
-			map.put("orderReview", rs.getObject("orderReview"));
+			map.put("rating", rs.getObject("orderRating"));
+			map.put("comment", rs.getObject("comment"));
 			return map;
 		});
 
+	}
+
+	public int resetPassword(CustomerBeans beans) {
+		StringBuilder updateQuery = new StringBuilder();
+		updateQuery.append("UPDATE customer_auth ca SET ").append(" ca.pin = ? ").append(" WHERE ca.id = ? ");
+
+		return jdbcTemplate.update(updateQuery.toString(), beans.getPin(), beans.getAuthId());
 	}
 
 }

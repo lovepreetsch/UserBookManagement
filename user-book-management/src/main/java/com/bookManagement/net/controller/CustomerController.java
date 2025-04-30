@@ -2,13 +2,11 @@ package com.bookManagement.net.controller;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -19,6 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bookManagement.net.beans.ResponseWrapper;
 import com.bookManagement.net.dto.CustomerDto;
 import com.bookManagement.net.services.CustomerServices;
+import com.bookManagement.net.services.DetailValidationGroup;
+import com.bookManagement.net.services.MinimalValidationGroup;
+import com.bookManagement.net.services.UpdateStatusValidationGroup;
+import com.bookManagement.net.services.UpdateValidationGroup;
 import com.bookManagement.net.util.ResponseDetails;
 
 @RestController
@@ -29,15 +31,7 @@ public class CustomerController {
 	private CustomerServices customerServices;
 
 	@PostMapping("/insert")
-	public ResponseEntity<Map<String, Object>> insertCustomer(@RequestBody CustomerDto dto,
-			BindingResult bindingResult) {
-
-		if (bindingResult.hasErrors()) {
-			String errorMessage = bindingResult.getFieldErrors().stream().map(FieldError::getDefaultMessage)
-					.collect(Collectors.joining(", "));
-			return ResponseEntity.badRequest().body(
-					Map.of("status", HttpStatus.BAD_REQUEST.value(), "message", "Validation failed: " + errorMessage));
-		}
+	public ResponseEntity<Map<String, Object>> insertCustomer(@RequestBody CustomerDto dto) {
 
 		if (!"CUSTOMER".equalsIgnoreCase(dto.getRole())) {
 			return ResponseEntity.badRequest().body(Map.of("status", HttpStatus.BAD_REQUEST.value(), "message",
@@ -118,16 +112,7 @@ public class CustomerController {
 	}
 
 	@GetMapping("/list")
-	public ResponseEntity<?> getCustomersList(@RequestBody CustomerDto dto, BindingResult bindingResult) {
-
-		if (bindingResult.hasErrors()) {
-			String errorMessage = bindingResult.getFieldErrors().stream()
-					.map(error -> error.getDefaultMessage().toString()).collect(Collectors.joining(", "));
-
-			Map<String, Object> response = new HashMap<>();
-			response.put("status", HttpStatus.BAD_REQUEST.value());
-			response.put("message", errorMessage);
-		}
+	public ResponseEntity<?> getCustomersList(@Validated(MinimalValidationGroup.class) @RequestBody CustomerDto dto) {
 
 		try {
 
@@ -158,16 +143,7 @@ public class CustomerController {
 	}
 
 	@GetMapping("/details")
-	public ResponseEntity<?> getCustomerById(@RequestBody CustomerDto dto, BindingResult bindingResult) {
-
-		if (bindingResult.hasErrors()) {
-			String errorMessage = bindingResult.getFieldErrors().stream()
-					.map(error -> error.getDefaultMessage().toString()).collect(Collectors.joining(", "));
-
-			Map<String, Object> response = new HashMap<>();
-			response.put("status", HttpStatus.BAD_REQUEST.value());
-			response.put("message", errorMessage);
-		}
+	public ResponseEntity<?> getCustomerById(@Validated(DetailValidationGroup.class) @RequestBody CustomerDto dto) {
 
 		try {
 
@@ -198,16 +174,7 @@ public class CustomerController {
 	}
 
 	@PutMapping("/update")
-	public ResponseEntity<?> editCustomer(@RequestBody CustomerDto dto, BindingResult bindingResult) {
-
-		if (bindingResult.hasErrors()) {
-			String errorMessage = bindingResult.getFieldErrors().stream().map(error -> error.getDefaultMessage())
-					.collect(Collectors.joining(", "));
-
-			Map<String, Object> response = new HashMap<>();
-			response.put("status", HttpStatus.BAD_REQUEST.value());
-			response.put("message", errorMessage);
-		}
+	public ResponseEntity<?> editCustomer(@Validated(UpdateValidationGroup.class) @RequestBody CustomerDto dto) {
 
 		try {
 
@@ -237,16 +204,8 @@ public class CustomerController {
 	}
 
 	@PutMapping("/updateStatus")
-	public ResponseEntity<?> updateCustomerStatus(@RequestBody CustomerDto dto, BindingResult bindingResult) {
-
-		if (bindingResult.hasErrors()) {
-			String errorMessage = bindingResult.getFieldErrors().stream().map(error -> error.getDefaultMessage())
-					.collect(Collectors.joining(", "));
-
-			Map<String, Object> response = new HashMap<>();
-			response.put("status", HttpStatus.BAD_REQUEST.value());
-			response.put("message", errorMessage);
-		}
+	public ResponseEntity<?> updateCustomerStatus(
+			@Validated(UpdateStatusValidationGroup.class) @RequestBody CustomerDto dto) {
 
 		try {
 
@@ -276,16 +235,8 @@ public class CustomerController {
 	}
 
 	@GetMapping("/order/history")
-	public ResponseEntity<?> getCustomerOrderHistory(@RequestBody CustomerDto dto, BindingResult bindingResult) {
-
-		if (bindingResult.hasErrors()) {
-			String errorMessage = bindingResult.getFieldErrors().stream().map(error -> error.getDefaultMessage())
-					.collect(Collectors.joining(", "));
-
-			Map<String, Object> response = new HashMap<>();
-			response.put("status", HttpStatus.BAD_REQUEST.value());
-			response.put("message", errorMessage);
-		}
+	public ResponseEntity<?> getCustomerOrderHistory(
+			@Validated(DetailValidationGroup.class) @RequestBody CustomerDto dto) {
 
 		try {
 			ResponseWrapper<?> DBresponse = customerServices.getCustomerOrderHistory(dto);
@@ -303,6 +254,35 @@ public class CustomerController {
 				return ResponseEntity.status(DBresponse.getStatus()).body(responseObj);
 			}
 
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			Map<String, Object> erroMessage = new HashMap<>();
+			erroMessage.put("status", ResponseDetails.INTERNAL_SERVER_ERROR_HttpStatusCode);
+			erroMessage.put("message", ResponseDetails.INTERNAL_SERVER_ERROR_ResponseMessage);
+
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(erroMessage);
+		}
+	}
+
+	@PutMapping("/password/reset")
+	public ResponseEntity<?> resetPassword(@RequestBody CustomerDto dto) {
+
+		try {
+
+			ResponseWrapper<?> DBresponse = customerServices.resetPassword(dto);
+
+			Map<String, Object> responseObj = new HashMap<>();
+			responseObj.put("status", DBresponse.getStatus());
+			responseObj.put("message", DBresponse.getMessage());
+
+			if (DBresponse.getSuccess() >= 1) {
+				return ResponseEntity.status(DBresponse.getStatus()).body(responseObj);
+			} else if (DBresponse.getSuccess() == 0) {
+				return ResponseEntity.status(DBresponse.getStatus()).body(responseObj);
+			} else {
+				return ResponseEntity.status(DBresponse.getStatus()).body(responseObj);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 

@@ -19,7 +19,7 @@ public class OrderBeans {
 	private String quantity;
 	private String totalAmount;
 	private String rating;
-	private String reviewDescription;
+	private String comment;
 
 	public String getId() {
 		return id;
@@ -85,12 +85,12 @@ public class OrderBeans {
 		this.rating = rating;
 	}
 
-	public String getReviewDescription() {
-		return reviewDescription;
+	public String getComment() {
+		return comment;
 	}
 
-	public void setReviewDescription(String reviewDescription) {
-		this.reviewDescription = reviewDescription;
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 }

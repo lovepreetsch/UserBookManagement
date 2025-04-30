@@ -1,19 +1,30 @@
 package com.bookManagement.net.dto;
 
+import com.bookManagement.net.services.DetailValidationGroup;
 import com.bookManagement.net.services.FullValidationGroup;
+import com.bookManagement.net.services.UpdateStatusValidationGroup;
+import com.bookManagement.net.services.UpdateValidationGroup;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class UserDto {
 
 	private String id;
+
+	@NotBlank(message = "User Id is required", groups = { DetailValidationGroup.class,
+			UpdateStatusValidationGroup.class, UpdateValidationGroup.class })
 	private String userId;
 	private String customerId;
 	private String authId;
+
+	@NotBlank(message = "Title is required", groups = { FullValidationGroup.class, UpdateValidationGroup.class })
 	private String title;
+
+	@NotBlank(message = "Name is required", groups = { FullValidationGroup.class, UpdateValidationGroup.class })
 	private String name;
 
 	@Email
@@ -31,16 +42,25 @@ public class UserDto {
 	private String pin;
 	private String page;
 	private String count;
+
+	@NotBlank(message = "Blood group is required", groups = { FullValidationGroup.class, UpdateValidationGroup.class })
 	private String bloodGroup;
 	private String invitationStatus;
 	private String token;
 	public String JWtoken;
+
+	@NotBlank(message = "Gender is required", groups = { FullValidationGroup.class, UpdateValidationGroup.class })
 	private String gender;
+
+	@NotBlank(message = "Date of Birth is required", groups = { FullValidationGroup.class,
+			UpdateValidationGroup.class })
 	private String DOB;
 	private String age;
 	private String orderId;
 	private String providerId;
 	private String StaffId;
+
+	@NotNull(message = "Active status is required", groups = UpdateStatusValidationGroup.class)
 	private Boolean activeStatus;
 	private Boolean isDeleted;
 	public Boolean isPatient = false;

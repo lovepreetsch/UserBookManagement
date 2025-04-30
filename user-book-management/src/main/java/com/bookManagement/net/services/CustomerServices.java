@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.bookManagement.net.beans.CustomerBeans;
@@ -19,6 +20,9 @@ public class CustomerServices {
 
 	@Autowired
 	private CustomerDao dao;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	public ResponseWrapper<?> insertCustomerProfile(CustomerDto dto) {
 
@@ -71,7 +75,8 @@ public class CustomerServices {
 			CustomerBeans beans = new CustomerBeans();
 			beans.setEmail(dto.getEmail());
 			beans.setMobileNumber(mobile);
-			beans.setPin(dto.getPin());
+			beans.setPin(passwordEncoder.encode(dto.getPin()));
+//			beans.setPin(dto.getPin());
 			beans.setRole(dto.getRole());
 
 			int rowsAffected = dao.insertCustomerAuth(beans);
@@ -344,6 +349,34 @@ public class CustomerServices {
 			e.printStackTrace();
 			return new ResponseWrapper<>(-1, ResponseDetails.INTERNAL_SERVER_ERROR_HttpStatusCode,
 					"An error occurred: " + e.getMessage());
+		}
+	}
+
+	public ResponseWrapper<?> resetPassword(CustomerDto dto) {
+
+		try {
+
+			CustomerBeans beans = new CustomerBeans();
+			beans.setAuthId(dto.getAuthId());
+			beans.setPin(passwordEncoder.encode(dto.getPin()));
+//			beans.setPin(dto.getPin());
+
+			int rowsAffected = dao.resetPassword(beans);
+
+			if (rowsAffected >= 1) {
+				return new ResponseWrapper<String>(1, ResponseDetails.OK_HttpStatusCode, "Password reset");
+			} else if (rowsAffected == 0) {
+				return new ResponseWrapper<String>(0, "Could not reset password",
+						ResponseDetails.INTERNAL_SERVER_ERROR_HttpStatusCode,
+						ResponseDetails.INTERNAL_SERVER_ERROR_ResponseMessage);
+			} else {
+				return new ResponseWrapper<String>(-2, ResponseDetails.INTERNAL_SERVER_ERROR_HttpStatusCode,
+						"Something went wrong");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseWrapper<>(-1, "An error occurred: " + e.getMessage(),
+					ResponseDetails.INTERNAL_SERVER_ERROR_HttpStatusCode, "Database error or exception");
 		}
 	}
 

@@ -1,5 +1,6 @@
 package com.bookManagement.net.beans;
 
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,8 @@ public class UserBeans {
 	private String authId;
 	private String title;
 	private String name;
+
+	@Email
 	private String email;
 	private String mobileNumber;
 	private String otp;

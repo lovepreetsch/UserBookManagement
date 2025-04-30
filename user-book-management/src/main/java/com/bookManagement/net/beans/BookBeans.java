@@ -20,8 +20,9 @@ public class BookBeans {
 	private String author;
 	private String price;
 	private String quantity;
-	private String review;
 	private Boolean activeStatus;
+	private String rating;
+	private String comment;
 
 	public String getId() {
 		return id;
@@ -95,20 +96,28 @@ public class BookBeans {
 		this.quantity = quantity;
 	}
 
-	public String getReview() {
-		return review;
-	}
-
-	public void setReview(String review) {
-		this.review = review;
-	}
-
 	public Boolean getActiveStatus() {
 		return activeStatus;
 	}
 
 	public void setActiveStatus(Boolean activeStatus) {
 		this.activeStatus = activeStatus;
+	}
+
+	public String getRating() {
+		return rating;
+	}
+
+	public void setRating(String rating) {
+		this.rating = rating;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 }
